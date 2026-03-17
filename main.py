@@ -17,7 +17,7 @@ def main() -> None:
 
     for player in data:
         current_player = data[player]
-        if current_player["guild"] is not None:
+        if current_player.get("guild") is not None:
             fields = {
                 "name": current_player["guild"]["name"],
                 "description": current_player["guild"]["description"],
@@ -29,14 +29,23 @@ def main() -> None:
             )
         else:
             guild = None
-
-        race, _ = Race.objects.get_or_create(
-            name=current_player["race"]["name"],
-            description=current_player["race"]["description"],
-        )
+        if current_player.get("race") is not None:
+            race, _ = Race.objects.get_or_create(
+                name=current_player["race"]["name"],
+                description=current_player["race"]["description"],
+            )
+        else:
+            race = None
         for skill in current_player["race"]["skills"]:
+            kwargs = {
+                "name": skill["name"],
+                "bonus": skill["bonus"],
+                "race": race,
+            }
             Skill.objects.get_or_create(
-                name=skill["name"], bonus=skill["bonus"], race=race
+                **{
+                    k: v for k, v in kwargs.items() if v is not None
+                }
             )
 
         kwargs = {
