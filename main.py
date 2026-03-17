@@ -1,5 +1,3 @@
-import sys
-
 import init_django_orm  # noqa: F401
 import json
 from db.models import Race, Skill, Player, Guild
@@ -25,7 +23,9 @@ def main() -> None:
                 "description": current_player["guild"]["description"],
             }
             guild, _ = Guild.objects.get_or_create(
-                **{key: value for key, value in fields.items() if value is not None}
+                **{
+                    k: v for k, v in fields.items() if v is not None
+                }
             )
         else:
             guild = None
@@ -36,9 +36,7 @@ def main() -> None:
         )
         for skill in current_player["race"]["skills"]:
             Skill.objects.get_or_create(
-                name=skill["name"],
-                bonus=skill["bonus"],
-                race=race
+                name=skill["name"], bonus=skill["bonus"], race=race
             )
 
         kwargs = {
@@ -50,7 +48,7 @@ def main() -> None:
         }
         player = Player(
             **{
-                key: value for key, value in kwargs.items() if value is not None
+                k: v for k, v in kwargs.items() if v is not None
             }
         )
         player.save()
